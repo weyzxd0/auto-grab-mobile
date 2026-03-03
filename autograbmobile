@@ -1,0 +1,176 @@
+print("Made by weyzxd")
+
+pcall(function()
+    game.StarterGui:SetCore("SendNotification", {
+        Title = "Script by weyzxd",
+        Text = "Premium Instant E Loaded",
+        Duration = 5
+    })
+end)
+
+local Player = game:GetService("Players").LocalPlayer
+local PPS = game:GetService("ProximityPromptService")
+local UIS = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+
+-- PlayerGui
+local UI_Target = Player:WaitForChild("PlayerGui")
+if UI_Target:FindFirstChild("WEYZ_UI") then
+    UI_Target.WEYZ_UI:Destroy()
+end
+
+local sg = Instance.new("ScreenGui", UI_Target)
+sg.Name = "WEYZ_UI"
+sg.ResetOnSpawn = false
+
+-- Ana Frame
+local Main = Instance.new("Frame", sg)
+Main.Size = UDim2.new(0, 220, 0, 90)
+Main.Position = UDim2.new(0.5, -110, 0, -100)
+Main.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 14)
+
+local strokeMain = Instance.new("UIStroke", Main)
+strokeMain.Thickness = 2
+strokeMain.Color = Color3.fromRGB(170, 0, 255)
+
+-- Başlık RGB Arka Plan
+local TitleBG = Instance.new("Frame", Main)
+TitleBG.Size = UDim2.new(1, 0, 0, 40)
+TitleBG.Position = UDim2.new(0, 0, 0, 5)
+TitleBG.BackgroundColor3 = Color3.fromRGB(255,0,255)
+Instance.new("UICorner", TitleBG).CornerRadius = UDim.new(0, 12)
+
+local Title = Instance.new("TextLabel", TitleBG)
+Title.Size = UDim2.new(1, 0, 1, 0)
+Title.Position = UDim2.new(0,0,0,0)
+Title.BackgroundTransparency = 1
+Title.Text = "Script by weyzxd"
+Title.TextColor3 = Color3.fromRGB(255,255,255)
+Title.TextScaled = true
+Title.Font = Enum.Font.GothamBlack
+
+-- RGB Animasyonu
+local colors = {Color3.fromRGB(255,0,0), Color3.fromRGB(255,150,0), Color3.fromRGB(0,255,0), Color3.fromRGB(0,255,255), Color3.fromRGB(0,0,255), Color3.fromRGB(255,0,255)}
+local index = 1
+spawn(function()
+    while true do
+        TweenService:Create(TitleBG, TweenInfo.new(0.5), {BackgroundColor3 = colors[index]}):Play()
+        index = index + 1
+        if index > #colors then index = 1 end
+        task.wait(0.5)
+    end
+end)
+
+-- Status Label
+local StatusLabel = Instance.new("TextLabel", Main)
+StatusLabel.Size = UDim2.new(1, -20, 0, 30)
+StatusLabel.Position = UDim2.new(0, 10, 0, 50)
+StatusLabel.BackgroundColor3 = Color3.fromRGB(15,15,15)
+StatusLabel.Text = "INSTANT E: OFF [Q]"
+StatusLabel.Font = Enum.Font.GothamBold
+StatusLabel.TextColor3 = Color3.fromRGB(255,70,70)
+StatusLabel.TextScaled = true
+Instance.new("UICorner", StatusLabel)
+
+-- Açılış Animasyonu
+TweenService:Create(Main, TweenInfo.new(0.6, Enum.EasingStyle.Back), {
+    Position = UDim2.new(0.5, -110, 0, 30)
+}):Play()
+
+-- LOGIC
+local IsActive = false
+
+local function toggle()
+    IsActive = not IsActive
+    
+    if IsActive then
+        StatusLabel.Text = "INSTANT E: ACTIVE"
+        StatusLabel.TextColor3 = Color3.fromRGB(0,255,170)
+        TweenService:Create(strokeMain, TweenInfo.new(0.4), {Color = Color3.fromRGB(0,255,170)}):Play()
+    else
+        StatusLabel.Text = "INSTANT E: OFF [Q]"
+        StatusLabel.TextColor3 = Color3.fromRGB(255,70,70)
+        TweenService:Create(strokeMain, TweenInfo.new(0.4), {Color = Color3.fromRGB(170,0,255)}):Play()
+    end
+end
+
+-- PC Q tuşu
+UIS.InputBegan:Connect(function(i, p)
+    if not p and i.KeyCode == Enum.KeyCode.Q then
+        toggle()
+    end
+end)
+
+-- F9 basınca
+UIS.InputBegan:Connect(function(input, gp)
+    if not gp and input.KeyCode == Enum.KeyCode.F9 then
+        print("Made by weyz")
+    end
+end)
+
+-- PPS Logic
+PPS.PromptButtonHoldBegan:Connect(function(prompt)
+    if IsActive then
+        prompt.HoldDuration = 0
+        task.spawn(function()
+            prompt:InputHoldBegin()
+            prompt:InputHoldEnd()
+            if fireproximityprompt then 
+                fireproximityprompt(prompt) 
+            end
+        end)
+    end
+end)
+
+PPS.PromptShown:Connect(function(prompt)
+    if IsActive then
+        prompt.HoldDuration = 0
+    end
+end)
+
+-- MOBIL SÜRÜKLENEBİLİR Q BUTON
+local MobileBtn = Instance.new("TextButton")
+MobileBtn.Parent = sg
+MobileBtn.Size = UDim2.new(0, 80, 0, 80)
+MobileBtn.Position = UDim2.new(1, -100, 1, -140)
+MobileBtn.BackgroundColor3 = Color3.fromRGB(0,120,255) -- mavi
+MobileBtn.TextColor3 = Color3.fromRGB(255,255,255)
+MobileBtn.Text = "Q"
+MobileBtn.TextScaled = true
+MobileBtn.Font = Enum.Font.GothamBlack
+Instance.new("UICorner", MobileBtn).CornerRadius = UDim.new(1,0)
+
+-- Sürüklenebilir
+local dragging = false
+local dragInput, mousePos, framePos
+
+MobileBtn.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging = true
+		mousePos = input.Position
+		framePos = MobileBtn.Position
+		input.Changed:Connect(function()
+			if input.UserInputState == Enum.UserInputState.End then
+				dragging = false
+			end
+		end)
+	end
+end)
+
+MobileBtn.InputChanged:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseMovement then
+		dragInput = input
+	end
+end)
+
+MobileBtn.InputChanged:Connect(function(input)
+	if input == dragInput and dragging then
+		local delta = input.Position - mousePos
+		MobileBtn.Position = UDim2.new(framePos.X.Scale, framePos.X.Offset + delta.X, framePos.Y.Scale, framePos.Y.Offset + delta.Y)
+	end
+end)
+
+MobileBtn.MouseButton1Click:Connect(function()
+	toggle()
+end)
